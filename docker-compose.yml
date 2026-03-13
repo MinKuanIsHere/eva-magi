@@ -1,0 +1,11 @@
+version: "3.9"
+
+services:
+  magi-web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: magi-web:latest
+    ports:
+      - "8080:80"
+    restart: unless-stopped
