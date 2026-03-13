@@ -2,6 +2,7 @@ export interface AudioController {
   prime: () => void
   playProcessing: () => Promise<void>
   stopProcessing: () => void
+  stopAll: () => void
   playDecision: (approved: boolean) => Promise<void>
 }
 
@@ -25,6 +26,7 @@ export function createAudioController(): AudioController {
       prime: () => undefined,
       playProcessing: async () => undefined,
       stopProcessing: () => undefined,
+      stopAll: () => undefined,
       playDecision: async () => undefined,
     }
   }
@@ -34,6 +36,7 @@ export function createAudioController(): AudioController {
       prime: () => undefined,
       playProcessing: async () => undefined,
       stopProcessing: () => undefined,
+      stopAll: () => undefined,
       playDecision: async () => undefined,
     }
   }
@@ -55,6 +58,10 @@ export function createAudioController(): AudioController {
     },
     playProcessing: async () => {
       try {
+        rejected.pause()
+        rejected.currentTime = 0
+        approvedSound.pause()
+        approvedSound.currentTime = 0
         await safePlay(processing)
       } catch {
         // ignore autoplay blocking
@@ -63,6 +70,14 @@ export function createAudioController(): AudioController {
     stopProcessing: () => {
       processing.pause()
       processing.currentTime = 0
+    },
+    stopAll: () => {
+      processing.pause()
+      processing.currentTime = 0
+      rejected.pause()
+      rejected.currentTime = 0
+      approvedSound.pause()
+      approvedSound.currentTime = 0
     },
     playDecision: async (approved: boolean) => {
       try {

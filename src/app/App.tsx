@@ -69,14 +69,57 @@ function createCheckpoint() {
   return `CP-${Math.floor(Math.random() * 900 + 100)}`
 }
 
+function isVote(value: unknown): value is Vote {
+  return value === 'APPROVE' || value === 'DISSENT'
+}
+
+function isNodeResult(value: unknown): value is NodeResult {
+  if (!value || typeof value !== 'object') return false
+  const node = value as Partial<NodeResult>
+  return (
+    (node.id === 'MELCHIOR-1' ||
+      node.id === 'BALTHASAR-2' ||
+      node.id === 'CASPER-3') &&
+    (node.persona === 'Scientist' ||
+      node.persona === 'Mother' ||
+      node.persona === 'Woman') &&
+    (node.accent === 'orange' || node.accent === 'amber' || node.accent === 'red') &&
+    isVote(node.vote)
+  )
+}
+
+function isDeliberationResult(value: unknown): value is DeliberationResult {
+  if (!value || typeof value !== 'object') return false
+  const result = value as Partial<DeliberationResult>
+  return (
+    typeof result.input === 'string' &&
+    (result.motionType === 'self_destruct' || result.motionType === 'general') &&
+    typeof result.motionLabel === 'string' &&
+    Array.isArray(result.nodes) &&
+    result.nodes.every(isNodeResult) &&
+    (result.finalDecision === 'APPROVED' || result.finalDecision === 'REJECTED')
+  )
+}
+
+function isHistoryItem(value: unknown): value is HistoryItem {
+  if (!value || typeof value !== 'object') return false
+  const item = value as Partial<HistoryItem>
+  return (
+    typeof item.id === 'number' &&
+    typeof item.createdAt === 'string' &&
+    typeof item.decisionCode === 'string' &&
+    isDeliberationResult(item.result)
+  )
+}
+
 function loadInitialHistory(): HistoryItem[] {
   try {
     const raw = window.localStorage.getItem(HISTORY_STORAGE_KEY)
     if (!raw) return []
 
-    const parsed = JSON.parse(raw) as HistoryItem[]
+    const parsed = JSON.parse(raw) as unknown
     if (!Array.isArray(parsed)) return []
-    return parsed.slice(0, 30)
+    return parsed.filter(isHistoryItem).slice(0, 30)
   } catch {
     return []
   }
@@ -97,6 +140,7 @@ function App() {
   const [history, setHistory] = useState<HistoryItem[]>(loadInitialHistory)
   const timeoutRef = useRef<number | null>(null)
   const flickerRef = useRef<number | null>(null)
+  const submitLockRef = useRef(false)
   const audioRef = useRef(createAudioController())
 
   useEffect(() => {
@@ -109,7 +153,7 @@ function App() {
       if (flickerRef.current !== null) {
         window.clearInterval(flickerRef.current)
       }
-      audioController.stopProcessing()
+      audioController.stopAll()
     }
   }, [])
 
@@ -123,7 +167,8 @@ function App() {
 
   const handleSubmit = () => {
     const trimmed = query.trim()
-    if (!trimmed || phase === 'processing') return
+    if (!trimmed || phase === 'processing' || submitLockRef.current) return
+    submitLockRef.current = true
 
     const motionType = classifyMotion(trimmed)
     const simulatedResult = simulateVotes(trimmed, motionType)
@@ -131,7 +176,17 @@ function App() {
     const nextDecisionCode = createDecisionCode()
     const nextCheckpoint = createCheckpoint()
 
+    if (timeoutRef.current !== null) {
+      window.clearTimeout(timeoutRef.current)
+      timeoutRef.current = null
+    }
+    if (flickerRef.current !== null) {
+      window.clearInterval(flickerRef.current)
+      flickerRef.current = null
+    }
+
     audioRef.current.prime()
+    audioRef.current.stopAll()
     void audioRef.current.playProcessing().catch(() => undefined)
 
     setPhase('processing')
@@ -171,6 +226,8 @@ function App() {
         window.clearInterval(flickerRef.current)
         flickerRef.current = null
       }
+      timeoutRef.current = null
+      submitLockRef.current = false
       setHistory((previous) => [
         {
           id: Date.now(),
@@ -208,7 +265,7 @@ function App() {
           </div>
         </section>
 
-        {activeTab === 'about' ? (
+        {/* {activeTab === 'about' ? (
           <section className="relative z-10 px-4 pt-5">
             <div className="eva-frame eva-cut p-4">
               <h2 className="font-display text-lg uppercase tracking-[0.24em] text-line2">
@@ -226,21 +283,69 @@ function App() {
               </p>
             </div>
           </section>
+        ) : null} */}
+
+        {activeTab === 'about' ? (
+          <section className="relative z-10 px-4 pt-5 animate-in fade-in duration-500">
+            <div className="eva-frame eva-cut p-5 bg-black/40 backdrop-blur-sm border-l-2 border-line2">
+              <h2 className="font-display text-lg uppercase tracking-[0.24em] text-line2 border-b border-line2/30 pb-2">
+                About MAGI System
+              </h2>
+
+              {/* 系統免責聲明：縮小字體並降低不透明度，模擬底層系統註解 */}
+              <div className="mt-4 text-[11px] leading-relaxed text-white/50 font-mono tracking-wider">
+                <span className="text-line2/70">[STATUS]</span> NON-COMMERCIAL FAN TRIBUTE<br />
+                <span className="text-line2/70">[ACCESS]</span> SHARED FOR PERSONAL CREATIVE USE ONLY
+              </div>
+
+              {/* 核心職能區塊：分點描述增加規格感 */}
+              <div className="mt-6 space-y-4">
+                <div className="flex gap-4">
+                  <div className="flex flex-col items-center">
+                    <span className="text-[10px] bg-line2 text-black px-1 font-bold leading-none py-0.5">01</span>
+                    <div className="w-[1px] h-full bg-line2/20 mt-1"></div>
+                  </div>
+                  <p className="text-sm leading-6 text-white/90">
+                    <strong className="text-line2 font-bold tracking-widest">MELCHIOR-1:</strong> Scientific logic and system integrity analysis.
+                  </p>
+                </div>
+
+                <div className="flex gap-4">
+                  <div className="flex flex-col items-center">
+                    <span className="text-[10px] bg-line2 text-black px-1 font-bold leading-none py-0.5">02</span>
+                    <div className="w-[1px] h-full bg-line2/20 mt-1"></div>
+                  </div>
+                  <p className="text-sm leading-6 text-white/90">
+                    <strong className="text-line2 font-bold tracking-widest">BALTHASAR-2:</strong> Ethical constraints and protective protocols.
+                  </p>
+                </div>
+
+                <div className="flex gap-4">
+                  <div className="flex flex-col items-center">
+                    <span className="text-[10px] bg-line2 text-black px-1 font-bold leading-none py-0.5">03</span>
+                  </div>
+                  <p className="text-sm leading-6 text-white/90">
+                    <strong className="text-line2 font-bold tracking-widest">CASPER-3:</strong> Biological instinct and self-preservation.
+                  </p>
+                </div>
+              </div>
+
+              {/* 決策機制總結 */}
+              <div className="mt-8 pt-4 border-t border-white/10">
+                <p className="text-sm leading-6 text-white/80 italic">
+                  Final resolution is synthesized via a 
+                  <span className="mx-2 text-line2 font-bold uppercase tracking-widest">Synchronized Consensus</span> 
+                  of all three personality layers.
+                </p>
+              </div>
+            </div>
+          </section>
         ) : null}
 
         {activeTab === 'task' ? (
-          <section className="relative z-10 px-3 pt-2">
-            <div className="eva-frame eva-cut p-2">
-              <p className="font-display text-[0.72rem] uppercase tracking-[0.36em] text-line2">
-                RESULT OF THE DELIBERATION
-              </p>
-              <p className="mt-1 font-display text-base uppercase tracking-[0.2em] text-line2">
-                {displayResult?.motionLabel ?? 'MOTION: STANDBY'}
-              </p>
-            </div>
-
-            <div className="mt-2 task-grid text-[0.58rem] uppercase leading-3 tracking-[0.1em] text-line2/95">
-              <div className="task-side">
+          <section className="relative z-10 h-[calc(100svh-140px)] overflow-y-auto px-3 pb-3 pt-2">
+            <div className="mt-1 task-grid text-[0.62rem] uppercase leading-3 tracking-[0.1em] text-line2/95">
+              <div className="task-side task-side-meta">
                 <p>TIME: {decisionTimestamp}</p>
                 <p>DECISION CODE:</p>
                 <p>{decisionCode}</p>
@@ -272,7 +377,7 @@ function App() {
               <div className="hex-core">MAGI</div>
             </div>
 
-            <div className="mt-1 grid grid-cols-2 gap-2">
+            <div className="mx-auto mt-1 grid w-full max-w-[302px] grid-cols-2 gap-2">
                 <motion.article
                   initial={{ opacity: 0, y: 16 }}
                   animate={{ opacity: 1, y: 0 }}

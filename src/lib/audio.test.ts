@@ -9,6 +9,7 @@ describe('createAudioController', () => {
     controller.prime()
     await expect(controller.playProcessing()).resolves.toBeUndefined()
     controller.stopProcessing()
+    controller.stopAll()
     await expect(controller.playDecision(true)).resolves.toBeUndefined()
   })
 })

@@ -1,15 +1,31 @@
 # MAGI EVA Tribute UI
 
-A mobile-first MAGI-inspired decision console tribute.  
-This project is for personal and non-commercial fan sharing.
+Mobile-first MAGI-inspired decision console tribute.  
+For personal, non-commercial fan sharing only.
 
-## Stack
+## Run with Docker Compose (Primary)
 
-- React + TypeScript + Vite
-- Tailwind CSS
-- Vitest + React Testing Library
+Build and start:
 
-## Local Development
+```bash
+docker compose up -d --build
+```
+
+Open `http://localhost:8080`.
+
+Stop:
+
+```bash
+docker compose down
+```
+
+Logs:
+
+```bash
+docker compose logs -f
+```
+
+## Local Dev (Optional)
 
 ```bash
 npm install
@@ -18,91 +34,41 @@ npm run dev
 
 Open `http://localhost:5173`.
 
-## Scripts
+## Validate
 
 ```bash
-npm test
 npm run lint
+npm test
 npm run build
 ```
 
-## Simplified Project Structure
+## Structure
 
 ```text
 src/
-  app/           # app shell, tabs, UI state
-  lib/           # classify/simulate/audio logic
-  styles/        # global theme and layout styles
-public/
-  sounds/        # runtime mp3 assets
-ops/
-  nginx/         # static web serving config
-  k8s/           # deployment manifests
+  app/            # tabs and page UI
+  components/     # shared visual components
+  lib/            # classify, simulation, audio
+  styles/         # global styles
+public/sounds/    # mp3 assets
+ops/nginx/        # nginx runtime config
+docker-compose.yml
+Dockerfile
 ```
 
-## Docker Compose Operations
+## Public Domain (VPS)
 
-Build and run:
-
-```bash
-docker compose up -d --build
-```
-
-Visit `http://localhost:8080`.
-
-Stop:
-
-```bash
-docker compose down
-```
-
-## Kubernetes Operations
-
-1. Build and push image:
-
-```bash
-docker build -t ghcr.io/your-org/magi-web:latest .
-docker push ghcr.io/your-org/magi-web:latest
-```
-
-2. Update image path in:
-
-- `ops/k8s/deployment.yaml`
-
-3. Apply manifests:
-
-```bash
-kubectl apply -f ops/k8s/deployment.yaml
-kubectl apply -f ops/k8s/service.yaml
-kubectl apply -f ops/k8s/ingress.yaml
-```
-
-## Publish to Public Domain
-
-### Option A (Recommended): Cloudflare Pages / Vercel / Netlify
-
-1. Push repository to GitHub.
-2. Connect repo in hosting platform.
-3. Build command: `npm run build`
-4. Output directory: `dist`
-5. Add custom domain in platform settings.
-6. Create DNS records at your domain provider:
-- Subdomain: `CNAME` -> platform target
-- Root domain: use `A/ALIAS` as required by platform
-7. Enable HTTPS (usually automatic).
-
-### Option B: Self-hosted (VPS + Docker)
-
-1. Deploy with `docker compose`.
-2. Place Nginx/Traefik in front.
+1. Prepare a VPS with Docker + Docker Compose.
+2. Deploy this repo and run `docker compose up -d --build`.
 3. Point DNS `A` record to VPS IP.
-4. Issue TLS with Let's Encrypt.
+4. Put TLS reverse proxy in front (Nginx Proxy Manager / Caddy / Traefik).
+5. Enable HTTPS certificate (Let's Encrypt).
 
-## Audio Sources (Mixkit Alerts)
+## Audio Sources
 
 - Urgent simple tone loop (processing)
 - Electric fence alert (rejected)
 - Game success alert (approved)
 
-Source catalog: https://mixkit.co/free-sound-effects/alerts/  
+Source: https://mixkit.co/free-sound-effects/alerts/  
 License: https://mixkit.co/license/

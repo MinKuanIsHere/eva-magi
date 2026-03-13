@@ -66,7 +66,9 @@ describe('App', () => {
     expect(screen.getByText(/about magi/i)).toBeInTheDocument()
 
     fireEvent.click(screen.getByRole('button', { name: /task/i }))
-    expect(screen.getByText(/result of the deliberation/i)).toBeInTheDocument()
+    expect(
+      screen.getByPlaceholderText(/enter motion \(e\.g\. self-destruct\)/i),
+    ).toBeInTheDocument()
   })
 
   it('clears history records', () => {
@@ -85,6 +87,36 @@ describe('App', () => {
     expect(screen.getByText(/initiate self-destruct sequence/i)).toBeInTheDocument()
 
     fireEvent.click(screen.getByRole('button', { name: /clear/i }))
+    expect(screen.getByText(/no decision records yet/i)).toBeInTheDocument()
+  })
+
+  it('prevents duplicate submit from rapid start clicks', () => {
+    render(<App />)
+
+    fireEvent.change(screen.getByLabelText(/enter motion/i), {
+      target: { value: 'rapid click test' },
+    })
+
+    const startButton = screen.getByRole('button', { name: /start|スタート/i })
+    fireEvent.click(startButton)
+    fireEvent.click(startButton)
+
+    act(() => {
+      vi.advanceTimersByTime(PROCESSING_DELAY_MS)
+    })
+
+    expect(screen.getByRole('button', { name: /history\(1\)/i })).toBeInTheDocument()
+  })
+
+  it('ignores malformed history payload from localStorage', () => {
+    window.localStorage.setItem(
+      'magi.history.v1',
+      JSON.stringify([{ invalid: true }, { id: 'bad-shape' }]),
+    )
+
+    render(<App />)
+    fireEvent.click(screen.getByRole('button', { name: /history/i }))
+
     expect(screen.getByText(/no decision records yet/i)).toBeInTheDocument()
   })
 })
