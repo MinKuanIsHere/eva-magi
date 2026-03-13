@@ -12,7 +12,8 @@ import type {
 } from './types'
 
 function resolveFinalDecision(nodes: NodeResult[]): FinalDecision {
-  return nodes.every((node) => node.vote === 'APPROVE') ? 'APPROVED' : 'REJECTED'
+  const approveCount = nodes.filter((node) => node.vote === 'APPROVE').length
+  return approveCount >= 2 ? 'APPROVED' : 'REJECTED'
 }
 
 export function simulateVotes(

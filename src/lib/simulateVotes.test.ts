@@ -12,10 +12,10 @@ describe('simulateVotes', () => {
       ['BALTHASAR-2', 'APPROVE'],
       ['CASPER-3', 'DISSENT'],
     ])
-    expect(result.finalDecision).toBe('REJECTED')
+    expect(result.finalDecision).toBe('APPROVED')
   })
 
-  it('returns approved only when all nodes approve', () => {
+  it('returns approved when majority of nodes approve', () => {
     const approveAll = vi.fn(() => 0.1)
     const result = simulateVotes('Authorize launch corridor', 'general', approveAll)
 
@@ -23,13 +23,24 @@ describe('simulateVotes', () => {
     expect(result.finalDecision).toBe('APPROVED')
   })
 
-  it('returns rejected when any general motion node dissents', () => {
-    const randomValues = [0.1, 0.1, 0.95]
+  it('returns approved when two out of three approve', () => {
+    const randomValues = [0.1, 0.1, 0.95] // APPROVE, APPROVE, DISSENT
     const rng = vi.fn(() => randomValues.shift() ?? 0.1)
 
     const result = simulateVotes('Authorize launch corridor', 'general', rng)
 
     expect(result.nodes[2]?.vote).toBe('DISSENT')
+    expect(result.finalDecision).toBe('APPROVED')
+  })
+
+  it('returns rejected when two out of three dissent', () => {
+    const randomValues = [0.95, 0.95, 0.1] // DISSENT, DISSENT, APPROVE
+    const rng = vi.fn(() => randomValues.shift() ?? 0.95)
+
+    const result = simulateVotes('Authorize launch corridor', 'general', rng)
+
+    expect(result.nodes[0]?.vote).toBe('DISSENT')
+    expect(result.nodes[1]?.vote).toBe('DISSENT')
     expect(result.finalDecision).toBe('REJECTED')
   })
 })

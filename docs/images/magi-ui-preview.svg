@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="620" viewBox="0 0 1000 620" fill="none">
+  <rect width="1000" height="620" fill="#05080F" />
+  <rect x="50" y="30" width="900" height="560" rx="18" fill="#08111D" stroke="#FF5A1F" stroke-opacity=".45" />
+  <rect x="90" y="70" width="820" height="48" fill="#07111D" stroke="#FF5A1F" stroke-opacity=".4" />
+  <text x="115" y="102" fill="#FF7F32" font-size="24" font-family="Orbitron, Arial, sans-serif" letter-spacing="2">ACCESS MODE: SUPERUSER</text>
+
+  <text x="95" y="170" fill="#FF7F32" font-size="20" font-family="Orbitron, Arial, sans-serif">TIME: MAR 13, 2026, 17:18:22</text>
+  <text x="95" y="200" fill="#FF7F32" font-size="20" font-family="Orbitron, Arial, sans-serif">DECISION CODE: MAGI-123456-ABCD</text>
+  <text x="95" y="230" fill="#FF7F32" font-size="20" font-family="Orbitron, Arial, sans-serif">CHECKPOINT: CP-451</text>
+
+  <text x="760" y="170" fill="#FF7F32" font-size="20" font-family="Orbitron, Arial, sans-serif">RESULT: APPROVED</text>
+  <text x="760" y="200" fill="#FF7F32" font-size="20" font-family="Orbitron, Arial, sans-serif">MOTION: GENERAL</text>
+  <text x="760" y="230" fill="#FF7F32" font-size="20" font-family="Orbitron, Arial, sans-serif">LINK: L431-BASIC</text>
+
+  <path d="M390 140H610V270L500 330L390 270V140Z" fill="#74D7DA" stroke="#FF5A1F" stroke-width="3" />
+  <text x="430" y="205" fill="#101215" font-size="20" font-family="Orbitron, Arial, sans-serif">BALTHASAR-2</text>
+  <text x="465" y="255" fill="#101215" font-size="62" font-family="Rajdhani, Arial, sans-serif">承認</text>
+
+  <rect x="435" y="360" width="130" height="38" fill="#111723" stroke="#FF5A1F" stroke-width="3" />
+  <text x="460" y="387" fill="#FF7F32" font-size="36" font-family="Orbitron, Arial, sans-serif">MAGI</text>
+
+  <path d="M210 430L240 400H500V540H210V430Z" fill="#74D7DA" stroke="#FF5A1F" stroke-width="3" />
+  <text x="300" y="485" fill="#101215" font-size="62" font-family="Rajdhani, Arial, sans-serif">承認</text>
+  <text x="288" y="525" fill="#101215" font-size="36" font-family="Orbitron, Arial, sans-serif">CASPER-3</text>
+
+  <path d="M530 400H790V540H530V400Z" fill="#FF4538" stroke="#FF5A1F" stroke-width="3" />
+  <text x="620" y="485" fill="#101215" font-size="62" font-family="Rajdhani, Arial, sans-serif">否決</text>
+  <text x="600" y="525" fill="#101215" font-size="36" font-family="Orbitron, Arial, sans-serif">MELCHIOR-1</text>
+</svg>

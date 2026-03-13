@@ -31,7 +31,7 @@ describe('App', () => {
     })
 
     expect(screen.getByText('RESULT:')).toBeInTheDocument()
-    expect(screen.getByText('REJECTED')).toBeInTheDocument()
+    expect(screen.getByText('APPROVED')).toBeInTheDocument()
     expect(screen.getByText('BALTHASAR-2')).toBeInTheDocument()
     expect(screen.getByText('CASPER-3')).toBeInTheDocument()
     expect(screen.getByText('MELCHIOR-1')).toBeInTheDocument()
@@ -39,7 +39,7 @@ describe('App', () => {
     fireEvent.click(screen.getByRole('button', { name: /history/i }))
     expect(screen.getByText(/decision history/i)).toBeInTheDocument()
     expect(screen.getByText(/initiate self-destruct sequence/i)).toBeInTheDocument()
-    expect(screen.getByText(/REJECTED/i)).toBeInTheDocument()
+    expect(screen.getByText(/APPROVED/i)).toBeInTheDocument()
   })
 
   it('submits with enter and resolves a general approved motion', async () => {
